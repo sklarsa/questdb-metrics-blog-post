@@ -1,0 +1,21 @@
+---
+volumes:
+  - name: starlark-script
+    configMap:
+      name: starlark-script
+mountPoints:
+  - name: starlark-script
+    mountPath: /opt/telegraf
+    subpath: remotewrite.star
+config:
+  outputs:
+    - socket_writer:
+        address: tcp://questdb.questdb.svc:9009
+  inputs:
+    - http_listener_v2:
+        service_address: ":9999"
+        path: "/write"
+        data_format: prometheusremotewrite
+  processors:
+    - starlark:
+        script: /opt/telegraf/remotewrite.star
