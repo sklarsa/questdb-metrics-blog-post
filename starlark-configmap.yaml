@@ -12,8 +12,4 @@ data:
                 metric.name = k
                 metric.fields["value"] = v
                 metric.fields.pop(k)
-            for k, v in metric.tags.items():
-                if k == "value":
-                    metric.tags["starlark_replaced_value"] = v
-                    metric.tags.pop(k)
         return metric
