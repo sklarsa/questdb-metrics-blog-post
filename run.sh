@@ -31,6 +31,13 @@ helm upgrade -i prometheus prometheus-community/prometheus \
     --create-namespace \
     --set 'server.remoteWrite[0].url=http://telegraf.telegraf.svc:9999/write'
 
+echo "waiting for all pods to start.  This could take a minute or two"
 
-echo "Wait a minute or so until all pods are Ready, then open a port-forward to QuestDB's frontend:"
-echo "kubectl port-forward service/questdb -n questdb 9000:9000"
+while [[ $(kubectl get pods -l app.kubernetes.io/name=questdb -n questdb -o 'jsonpath={..status.conditions[?(@.type=="Ready")].status}') != "True" ]]; do
+    sleep 10 && echo "still waiting ..." ;
+done
+
+echo 'You can now access QuestDB here: http://localhost:9000'
+echo 'Ctrl-C to exit'
+
+kubectl port-forward service/questdb -n questdb 9000:9000
